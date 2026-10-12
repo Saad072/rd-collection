@@ -294,7 +294,7 @@ export default function CollectionPage() {
     (async () => {
       try {
         const [colRes, cats] = await Promise.all([
-          api.getCollection(slug, { pageSize: 500 }),
+          api.getCollection(slug, { pageSize: 60 }),
           api.getCategories().catch(() => [] as Category[]),
         ]);
         if (cancelled) return;
@@ -313,7 +313,7 @@ export default function CollectionPage() {
             if (!cat) {
               throw new ApiError('NOT_FOUND', 'We could not find this collection.', 404);
             }
-            const res = await api.getProducts({ category: slug, pageSize: 500 });
+            const res = await api.getProducts({ category: slug, pageSize: 60 });
             if (cancelled) return;
             setCatNames(Object.fromEntries(cats.map((c) => [c.slug, c.name])));
             setData({
