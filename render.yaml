@@ -1,0 +1,44 @@
+# Render Blueprint — RD_COLLECTION (single-service deploy)
+# The Express server builds + serves the React client itself (CLIENT_DIST),
+# so one Web Service is enough: API + storefront on a single public URL.
+services:
+  - type: web
+    name: rd-collection
+    runtime: node
+    plan: free
+    buildCommand: |
+      cd server && npm install && npm run build && \
+      cd ../client && npm install && npm run build
+    startCommand: cd server && npm start
+    healthCheckPath: /healthz
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      - key: CLIENT_DIST
+        value: ../client/dist
+      - key: CLIENT_ORIGIN
+        value: https://rd-collection.onrender.com
+        # ↑ change after first deploy if you attach a custom domain
+      - key: MONGODB_URI
+        sync: false # paste your MongoDB Atlas connection string in the Render dashboard
+      - key: JWT_SECRET
+        generateValue: true
+      - key: ADMIN_EMAIL
+        value: admin@rdcollection.in # seed only; change after first login
+      - key: ADMIN_PASSWORD
+        generateValue: true # seed only; copy it, then change after first login
+      # Optional (test adapters are used when absent — clearly marked "simulated"):
+      - key: RAZORPAY_KEY_ID
+        sync: false
+      - key: RAZORPAY_KEY_SECRET
+        sync: false
+      - key: RAZORPAY_WEBHOOK_SECRET
+        sync: false
+      - key: CLOUDINARY_CLOUD_NAME
+        sync: false
+      - key: CLOUDINARY_API_KEY
+        sync: false
+      - key: CLOUDINARY_API_SECRET
+        sync: false
