@@ -6,9 +6,12 @@ services:
     name: rd-collection
     runtime: node
     plan: free
+    # NOTE: Render sets NODE_ENV=production, which makes plain `npm install`
+    # skip devDependencies — but tsc/vite/tsx are devDependencies, so the
+    # build would fail without --include=dev.
     buildCommand: |
-      cd server && npm install && npm run build && \
-      cd ../client && npm install && npm run build
+      cd server && npm install --include=dev && npm run build && \
+      cd ../client && npm install --include=dev && npm run build
     startCommand: cd server && npm start
     healthCheckPath: /healthz
     envVars:

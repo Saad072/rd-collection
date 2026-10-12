@@ -17,7 +17,12 @@ import { User } from './models/User';
 import { slugify } from './utils/text';
 import bcrypt from 'bcryptjs';
 
-const DEPLOY_ROOT = '/home/hatch/workspace/rd-collection-deploy';
+// Seed data lives inside this repo (server/seed-assets/) so `npm run seed`
+// works on any host (Render Shell included), not just the dev VM.
+// Override with SEED_SOURCE_DIR if the assets live elsewhere.
+const DEPLOY_ROOT = process.env.SEED_SOURCE_DIR
+  ? path.resolve(process.env.SEED_SOURCE_DIR)
+  : path.resolve(process.cwd(), 'seed-assets');
 const PUBLIC_DIR = path.resolve(process.cwd(), 'public');
 
 interface SourceProduct {
@@ -38,11 +43,9 @@ interface SourceProduct {
 
 function loadSource(): SourceProduct[] {
   // The source file is CommonJS; require it directly.
+  const dataFile = path.join(DEPLOY_ROOT, 'starter-products.js');
   // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const products = require(path.join(
-    DEPLOY_ROOT,
-    'scripts/starter-products.js',
-  )) as SourceProduct[];
+  const products = require(dataFile) as SourceProduct[];
   if (!Array.isArray(products) || !products.length) {
     throw new Error('starter-products.js did not export a product array');
   }
